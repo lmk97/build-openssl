@@ -23,18 +23,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-#      - name: Setup 7-zip
-#        uses: milliewalky/setup-7-zip@v1
-      - name: Setup perl
-        uses: shogo82148/actions-setup-perl@v1
-        with:
-          perl-version: "5.32"
-          distribution: strawberry
-      - name: Install cpm and modules
-        uses: perl-actions/install-with-cpm@v1
-        with:
-          install: |
-            Locale::Maketext::Simple
+      - name: Setup 7-zip
+        uses: milliewalky/setup-7-zip@v1
+      - name: Setup msvc cmd
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup nasm
+        uses: ilammy/setup-nasm@v1
+      - name: Install perl
+        run: |
+          mkdir perl
+          cd perl
+          wget https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.zip -O strawberry-perl.zip
+          7z x strawberry-perl.zip
       - name: Fetch openssl code
         run: |
           git clone https://github.com/openssl/openssl.git
@@ -44,8 +44,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          where perl
-          C:/Strawberry/perl/bin/perl.exe Configure VC-WIN64A no-asm --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
           nmake
           nmake install
           ls build
