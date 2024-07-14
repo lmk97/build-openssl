@@ -38,13 +38,16 @@ jobs:
             ExtUtils::Manifest
             App::cpanminus
             Locale::Maketext::Simple
+      - name: Set perl environment variables
+        run: |
+          echo "PERL=$((where.exe perl)[0])" | Out-File -FilePath $env:GITHUB_ENV-Append -Encoding utf8
+          echo "OPENSSL_SRC_PERL=$((where.exe perl)[0])" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
       - name: Fetch openssl code
         run: |
           git clone https://github.com/openssl/openssl.git
           cd openssl
           git checkout openssl-$OPENSSL_VERSION
       - name: Build static library
-        shell: pwsh
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
