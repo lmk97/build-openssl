@@ -44,8 +44,8 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           mkdir openssl_build
-          cd openssl
-          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build --banner=Configured no-makedepend enable-fips
+          cd openssl_build
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe ../openssl/Configure --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build --banner=Configured no-makedepend enable-fips
           nmake /S
           nmake install
-          ls build
+          ls
