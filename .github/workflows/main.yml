@@ -15,7 +15,7 @@ jobs:
 
   build-windows:
     name: windows
-    runs-on: windows-2022
+    runs-on: windows-latest
     strategy:
       fail-fast: false
       matrix:
@@ -44,7 +44,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A no-shared -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build
           nmake
           nmake install
           ls build
