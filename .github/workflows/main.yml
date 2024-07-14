@@ -40,11 +40,14 @@ jobs:
           git clone https://github.com/openssl/openssl.git
           cd openssl
           git checkout openssl-$OPENSSL_VERSION
+      - name: Setup msvc environment
+        shell: cmd
+        run: |
+          call vcvarsall.bat x64
       - name: Build static library
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          cmd /C "vcvarsall.bat x64"
           $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A no-shared -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build
           nmake
           nmake install
