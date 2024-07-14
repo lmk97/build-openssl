@@ -33,7 +33,7 @@ jobs:
         run: |
           mkdir perl
           cd perl
-          wget https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.zip -O strawberry-perl.zip
+          curl -o strawberry-perl.zip https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.zip
           7z x strawberry-perl.zip
       - name: Fetch openssl code
         run: |
