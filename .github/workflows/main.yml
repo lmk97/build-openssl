@@ -42,9 +42,11 @@ jobs:
           git checkout openssl-$OPENSSL_VERSION
       - name: Build static library
         run: |
-          cd $GITHUB_WORKSPACE/openssl
-          mkdir build
-          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build
-          nmake
+          cd $GITHUB_WORKSPACE
+          mkdir openssl_build
+          cd openssl
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build --banner=Configured no-makedepend enable-fips
+          ../openssl_build/configdata.pm --dump
+          nmake /S
           nmake install
           ls build
