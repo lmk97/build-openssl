@@ -25,19 +25,8 @@ jobs:
         uses: actions/checkout@v3
 #      - name: Setup 7-zip
 #        uses: milliewalky/setup-7-zip@v1
-      - name: Setup perl
-        uses: shogo82148/actions-setup-perl@v1
-        with:
-          perl-version: "5.32"
-          distribution: strawberry
-      - name: Setup perl cpm and install deps
-        uses: perl-actions/install-with-cpm@v1
-        with:
-          global: true
-          install: |
-            ExtUtils::Manifest
-            App::cpanminus
-            Locale::Maketext::Simple
+      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: ilammy/setup-nasm@v1
       - name: Fetch openssl code
         run: |
           git clone https://github.com/openssl/openssl.git
@@ -47,7 +36,8 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          perl Configure VC-WIN64A no-asm --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
-          nmake
-          nmake install
+          perl Configure VC-WIN64A --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --banner=Configured no-makedepend enable-fips --release
+          cd build
+          ./configdata.pm --dump
+          nmake /S
           ls build
