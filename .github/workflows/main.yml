@@ -9,7 +9,7 @@ env:
 
 defaults:
   run:
-    shell: pwsh
+    shell: bash
 
 jobs:
 
@@ -44,6 +44,7 @@ jobs:
           cd openssl
           git checkout openssl-$OPENSSL_VERSION
       - name: Build static library
+        shell: pwsh
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
