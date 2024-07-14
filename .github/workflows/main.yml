@@ -45,7 +45,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           mkdir openssl_build
           cd openssl_build
-          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe ../openssl/Configure --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build --banner=Configured no-makedepend enable-fips
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe ../openssl/Configure VC-WIN64A no-asm --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build
           nmake
           nmake install
           ls ../openssl_build
