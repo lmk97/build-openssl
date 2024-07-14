@@ -44,9 +44,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          cmd /C
-          C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvarsall.bat x64
-          exit
+          cmd /C "vcvarsall.bat x64"
           $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A no-shared -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build
           nmake
           nmake install
