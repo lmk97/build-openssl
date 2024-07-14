@@ -30,12 +30,12 @@ jobs:
         with:
           perl-version: "5.32"
           distribution: strawberry
-      - name: Install deps using cpm
+      - name: Setup perl cpm and install deps
         uses: perl-actions/install-with-cpm@v1
         with:
-          cpanfile: "cpanfile"
-          args: "--with-suggests --with-recommends --with-test"
-      - run: prove -lr t
+          install: |
+            ExtUtils::Manifest
+            App::cpanminus
       - name: Fetch openssl code
         run: |
           git clone https://github.com/openssl/openssl.git
