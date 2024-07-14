@@ -1,0 +1,90 @@
+name: Publish openssl include files and static library
+on: [push]
+#  release:
+#    types:
+#      - published
+
+env:
+  OPENSSL_VERSION: "3.3.1"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build-linux:
+    name: linux
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86_64, aarch64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Fetch openssl code
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout openssl-$OPENSSL_VERSION
+      - name: Build static library
+        run: |
+          cd $GITHUB_WORKSPACE/openssl
+          mkdir build
+          ./Configure --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          make
+          make install
+
+  build-macos:
+    name: macos
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86_64, aarch64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Fetch openssl code
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout openssl-$OPENSSL_VERSION
+      - name: Build static library
+        run: |
+          cd $GITHUB_WORKSPACE/openssl
+          mkdir build
+          ./configure --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          make
+          make install
+
+  build-windows:
+    name: windows
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86_64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup 7-zip
+        uses: milliewalky/setup-7-zip@v1
+      - uses: shogo82148/actions-setup-perl@v1
+          with:
+            perl-version: "5.32"
+            distribution: strawberry
+      - run: cpanm --installdeps .
+      - run: prove -lv t
+      - name: Fetch openssl code
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout openssl-$OPENSSL_VERSION
+      - name: Build static library
+        run: |
+          cd $GITHUB_WORKSPACE/openssl
+          mkdir build
+          perl Configure VC-WIN64A --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          nmake
+          nmake install
