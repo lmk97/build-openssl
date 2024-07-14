@@ -36,6 +36,7 @@ jobs:
           install: |
             ExtUtils::Manifest
             App::cpanminus
+            Locale::Maketext::Simple
       - name: Fetch openssl code
         run: |
           git clone https://github.com/openssl/openssl.git
