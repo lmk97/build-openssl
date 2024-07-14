@@ -33,6 +33,7 @@ jobs:
       - name: Setup perl cpm and install deps
         uses: perl-actions/install-with-cpm@v1
         with:
+          global: true
           install: |
             ExtUtils::Manifest
             App::cpanminus
