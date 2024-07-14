@@ -30,6 +30,10 @@ jobs:
         with:
           perl-version: "5.38"
           distribution: strawberry
+      - name: Config cpanm
+        run: cpanm ExtUtils::Manifest App::cpanminus
+      - name: Install cpanm deps
+        run: cpanm -n --installdeps .
       - name: Fetch openssl code
         run: |
           git clone https://github.com/openssl/openssl.git
