@@ -44,7 +44,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure no-shared -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build
           nmake
           nmake install
           ls build
