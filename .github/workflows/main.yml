@@ -25,10 +25,16 @@ jobs:
         uses: actions/checkout@v3
 #      - name: Setup 7-zip
 #        uses: milliewalky/setup-7-zip@v1
-      - name: Set perl environment variables
-        run: |
-          echo "PERL=$(where.exe perl | head -n 2)" >> $GITHUB_ENV
-          echo "OPENSSL_SRC_PERL=$(where.exe perl | head -n 2)" >> $GITHUB_ENV
+      - name: Setup perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: "5.32"
+          distribution: strawberry
+      - name: Install cpm and modules
+        uses: perl-actions/install-with-cpm@v1
+        with:
+          install: |
+            Locale::Maketext::Simple
       - name: Fetch openssl code
         run: |
           git clone https://github.com/openssl/openssl.git
@@ -39,7 +45,7 @@ jobs:
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
           where perl
-          perl Configure VC-WIN64A no-asm --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          C:/Strawberry/perl/bin/perl.exe Configure VC-WIN64A no-asm --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
           nmake
           nmake install
           ls build
