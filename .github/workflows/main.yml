@@ -23,8 +23,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup 7-zip
-        uses: milliewalky/setup-7-zip@v1
+#      - name: Setup 7-zip
+#        uses: milliewalky/setup-7-zip@v1
+      - name: Setup perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: "5.32"
+          distribution: strawberry
+      - name: Install cpanm deps
+        run: cpanm --installdeps .
+      - name: Prove cpanm
+        run: prove -lv t
       - name: Fetch openssl code
         run: |
           git clone https://github.com/openssl/openssl.git
