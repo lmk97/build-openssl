@@ -52,4 +52,9 @@ jobs:
         run: nmake /S
       - name: Install
         shell: cmd
+        working-directory: openssl_build
         run: nmake install
+      - name: Show build dir
+        run: |
+          cd $GITHUB_WORKSPACE/openssl_build
+          ls
