@@ -45,7 +45,7 @@ jobs:
           cd $GITHUB_WORKSPACE
           mkdir openssl_build
           cd openssl_build
-          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe ../openssl/Configure VC-WIN64A no-asm no-shared no-zlib no-deprecated no-ssl no-legacy no-apps no-tests --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe ../openssl/Configure VC-WIN64A no-shared no-zlib no-deprecated no-legacy no-apps no-tests --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build
       - name: Build static library
         shell: cmd
         working-directory: openssl_build
@@ -58,3 +58,4 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl_build
           ls
+          ls lib
