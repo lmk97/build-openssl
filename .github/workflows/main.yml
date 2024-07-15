@@ -7,10 +7,6 @@ on: [push]
 env:
   OPENSSL_VERSION: "3.3.1"
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
 
   build-windows:
