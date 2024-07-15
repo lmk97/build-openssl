@@ -1,46 +1,32 @@
-name: Build OpenSSL for Windows
-
-on: [push]
-
+name: Windows CI
+ 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+ 
 jobs:
-  build-openssl:
+  build:
     runs-on: windows-latest
-
+ 
     steps:
-    - name: Install Perl
-      shell: pwsh
-      run: |
-        $url = "https://www.activestate.com/products/perl/download/?version=5.30.1.1&platform=win64"
-        Invoke-WebRequest -Uri $url -OutFile perl-installer.exe
-        Start-Process .\perl-installer.exe -Wait -ArgumentList "/S /D=C:\Perl64"
-
-    - name: Install NASM
-      shell: pwsh
-      run: |
-        $url = "https://www.nasm.us/pub/nasm/releasebuilds/2.15.05/win64/nasm-2.15.05-installer-x64.exe"
-        Invoke-WebRequest -Uri $url -OutFile nasm-installer.exe
-        Start-Process .\nasm-installer.exe -Wait -ArgumentList "/S"
-
-    - name: Add to PATH
-      shell: pwsh
-      run: |
-        $env:Path += ";C:\Perl64\bin"
-        $env:Path += ";C:\Program Files\NASM"
-
-    - name: Fetch openssl code
-      run: |
-        git clone https://github.com/openssl/openssl.git
-        cd openssl
-        git checkout openssl-$OPENSSL_VERSION
-
+    - uses: actions/checkout@v2
+ 
+    - name: Setup VS
+      uses: microsoft/setup-msbuild@v1.0.2
+      with:
+        vs-version: 2019
+ 
+    - name: Setup Perl
+      uses: rtomayko/perl-action@v1.1.2
+ 
     - name: Configure OpenSSL
-      working-directory: ./openssl
-      run: perl Configure VC-WIN64A --prefix=D:\OpenSSL
-
-    - name: Build OpenSSL
-      working-directory: ./openssl
-      run: nmake
-
-    - name: Install OpenSSL
-      working-directory: ./openssl
-      run: nmake install
+      run: |
+        cd \openssl
+        perl Configure VC-WIN32 no-shared --prefix=C:\msys64\home\runner\openssl-latest --openssldir=C:\msys64\home\runner\openssl-latest
+        nmake
+        nmake test
+        nmake install
+      env:
+        PATH: ${{ github.workspace }}\msys64\usr\bin;${{ github.workspace }}\msys64\mingw64\bin;$PATH
