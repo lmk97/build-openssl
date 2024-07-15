@@ -1,28 +1,55 @@
-name: Windows CI
- 
+name: Publish openssl include files and static library
 on: [push]
- 
+#  release:
+#    types:
+#      - published
+
+env:
+  OPENSSL_VERSION: "3.3.1"
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
-  build:
+
+  build-windows:
+    name: windows
     runs-on: windows-latest
- 
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86_64]
     steps:
-    - uses: actions/checkout@v2
- 
-    - name: Setup VS
-      uses: microsoft/setup-msbuild@v1.0.2
-      with:
-        vs-version: 2019
- 
-    - name: Setup Perl
-      uses: rtomayko/perl-action@v1.1.2
- 
-    - name: Configure OpenSSL
-      run: |
-        cd \openssl
-        perl Configure VC-WIN32 no-shared --prefix=C:\msys64\home\runner\openssl-latest --openssldir=C:\msys64\home\runner\openssl-latest
-        nmake
-        nmake test
-        nmake install
-      env:
-        PATH: ${{ github.workspace }}\msys64\usr\bin;${{ github.workspace }}\msys64\mingw64\bin;$PATH
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup 7-zip
+        uses: milliewalky/setup-7-zip@v1
+      - name: Setup msvc cmd
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Setup nasm
+        uses: ilammy/setup-nasm@v1
+      - name: Install perl
+        run: |
+          mkdir perl
+          cd perl
+          curl -o strawberry-perl.zip https://strawberryperl.com/download/5.32.1.1/strawberry-perl-5.32.1.1-64bit.zip
+          7z x strawberry-perl.zip
+      - name: Fetch openssl code
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout openssl-$OPENSSL_VERSION
+      - name: Configure by perl
+        run: |
+          cd $GITHUB_WORKSPACE
+          mkdir openssl_build
+          cd openssl_build
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe ../openssl/Configure VC-WIN64A no-asm no-shared no-zlib --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build
+      - name: Build static library
+        shell: cmd
+        working-directory: openssl_build
+        run: nmake /S
+      - name: Install
+        shell: cmd
+        run: nmake install
