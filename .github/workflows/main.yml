@@ -97,7 +97,7 @@ jobs:
           make install
       - name: Show dir
         run: |
-          cd cd $GITHUB_WORKSPACE/openssl/build
+          cd $GITHUB_WORKSPACE/openssl/build
           ls
           ls include
       - name: Compress static library
@@ -166,7 +166,7 @@ jobs:
         run: nmake install
       - name: Show dir
         run: |
-          cd cd $GITHUB_WORKSPACE/openssl/build
+          cd $GITHUB_WORKSPACE/openssl/build
           ls
           ls include
       - name: Compress static library
