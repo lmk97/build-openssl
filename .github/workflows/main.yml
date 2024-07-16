@@ -38,12 +38,12 @@ jobs:
         if: ${{ matrix.platform == 'x86_64' }}
         run: |
           cd $GITHUB_WORKSPACE/openssl/build
-          tar -zcvf openssl-include.tar.gz -C include .
+          tar -zcvf openssl-include.tar.gz -C include/openssl .
       - name: Compress static library
         run: |
           cd $GITHUB_WORKSPACE/openssl/build
-          gzip -9 -c lib/libssl.a > ssl-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
-          gzip -9 -c lib/libcrypto.a > crypto-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
+          gzip -9 -c lib64/libssl.a > ssl-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
+          gzip -9 -c lib64/libcrypto.a > crypto-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
       - name: Upload include files
         if: ${{ matrix.platform == 'x86_64' }}
         uses: actions/upload-release-asset@v1
@@ -95,11 +95,16 @@ jobs:
           ./configure no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
           make
           make install
+      - name: Show dir
+        run: |
+          cd cd $GITHUB_WORKSPACE/openssl/build
+          ls
+          ls include
       - name: Compress static library
         run: |
           cd $GITHUB_WORKSPACE/openssl/build
-          gzip -9 -c lib/libssl.a > ssl-lib-${{ matrix.platform }}-apple-darwin.gz
-          gzip -9 -c lib/libcrypto.a > crypto-lib-${{ matrix.platform }}-apple-darwin.gz
+          gzip -9 -c lib64/libssl.a > ssl-lib-${{ matrix.platform }}-apple-darwin.gz
+          gzip -9 -c lib64/libcrypto.a > crypto-lib-${{ matrix.platform }}-apple-darwin.gz
       - name: Upload ssl static library
         uses: actions/upload-release-asset@v1
         env:
@@ -159,11 +164,16 @@ jobs:
         shell: cmd
         working-directory: openssl/build
         run: nmake install
+      - name: Show dir
+        run: |
+          cd cd $GITHUB_WORKSPACE/openssl/build
+          ls
+          ls include
       - name: Compress static library
         run: |
           cd $GITHUB_WORKSPACE/openssl/build
-          7z a -tgzip -mx=9 ssl-lib-${{ matrix.platform }}-pc-windows-msvc.gz lib/libssl.lib
-          7z a -tgzip -mx=9 crypto-lib-${{ matrix.platform }}-pc-windows-msvc.gz lib/libcrypto.lib
+          7z a -tgzip -mx=9 ssl-lib-${{ matrix.platform }}-pc-windows-msvc.gz lib64/libssl.lib
+          7z a -tgzip -mx=9 crypto-lib-${{ matrix.platform }}-pc-windows-msvc.gz lib64/libcrypto.lib
       - name: Upload ssl static library
         uses: actions/upload-release-asset@v1
         env:
