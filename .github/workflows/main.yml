@@ -95,16 +95,11 @@ jobs:
           ./configure no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
           make
           make install
-      - name: Show dir
-        run: |
-          cd $GITHUB_WORKSPACE/openssl/build
-          ls
-          ls include
       - name: Compress static library
         run: |
           cd $GITHUB_WORKSPACE/openssl/build
-          gzip -9 -c lib64/libssl.a > ssl-lib-${{ matrix.platform }}-apple-darwin.gz
-          gzip -9 -c lib64/libcrypto.a > crypto-lib-${{ matrix.platform }}-apple-darwin.gz
+          gzip -9 -c lib/libssl.a > ssl-lib-${{ matrix.platform }}-apple-darwin.gz
+          gzip -9 -c lib/libcrypto.a > crypto-lib-${{ matrix.platform }}-apple-darwin.gz
       - name: Upload ssl static library
         uses: actions/upload-release-asset@v1
         env:
@@ -155,7 +150,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build --release
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
       - name: Build static library
         shell: cmd
         working-directory: openssl/build
