@@ -1,8 +1,8 @@
 name: Publish openssl include files and static library
-on: [push]
-#  release:
-#    types:
-#      - published
+on:
+  release:
+    types:
+      - published
 
 env:
   OPENSSL_VERSION: "3.3.1"
@@ -12,6 +12,112 @@ defaults:
     shell: bash
 
 jobs:
+  build-linux:
+    name: linux
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86_64, aarch64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Fetch openssl code
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout openssl-$OPENSSL_VERSION
+      - name: Build static library
+        run: |
+          cd $GITHUB_WORKSPACE/openssl
+          mkdir build
+          ./Configure no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          make
+          make install
+      - name: Compress include files
+        if: ${{ matrix.platform == 'x86_64' }}
+        run: |
+          cd $GITHUB_WORKSPACE/openssl/build
+          tar -zcvf openssl-include.tar.gz -C include/openssl .
+      - name: Compress static library
+        run: |
+          cd $GITHUB_WORKSPACE/openssl/build
+          gzip -9 -c lib64/libssl.a > ssl-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
+          gzip -9 -c lib64/libcrypto.a > crypto-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
+      - name: Upload include files
+        if: ${{ matrix.platform == 'x86_64' }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}/openssl/build/openssl-include.tar.gz
+          asset_name: openssl-include.tar.gz
+          asset_content_type: application/gzip
+      - name: Upload ssl static library
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}/openssl/build/ssl-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
+          asset_name: ssl-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
+          asset_content_type: application/gzip
+      - name: Upload crypto static library
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}/openssl/build/crypto-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
+          asset_name: crypto-lib-${{ matrix.platform }}-unknown-linux-gnu.gz
+          asset_content_type: application/gzip
+
+  build-macos:
+    name: macos
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [x86_64, aarch64]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Fetch openssl code
+        run: |
+          git clone https://github.com/openssl/openssl.git
+          cd openssl
+          git checkout openssl-$OPENSSL_VERSION
+      - name: Build static library
+        run: |
+          cd $GITHUB_WORKSPACE/openssl
+          mkdir build
+          ./configure no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          make
+          make install
+      - name: Compress static library
+        run: |
+          cd $GITHUB_WORKSPACE/openssl/build
+          gzip -9 -c lib/libssl.a > ssl-lib-${{ matrix.platform }}-apple-darwin.gz
+          gzip -9 -c lib/libcrypto.a > crypto-lib-${{ matrix.platform }}-apple-darwin.gz
+      - name: Upload ssl static library
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}/openssl/build/ssl-lib-${{ matrix.platform }}-apple-darwin.gz
+          asset_name: ssl-lib-${{ matrix.platform }}-apple-darwin.gz
+          asset_content_type: application/gzip
+      - name: Upload crypto static library
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}/openssl/build/crypto-lib-${{ matrix.platform }}-apple-darwin.gz
+          asset_name: crypto-lib-${{ matrix.platform }}-apple-darwin.gz
+          asset_content_type: application/gzip
 
   build-windows:
     name: windows
@@ -53,8 +159,26 @@ jobs:
         shell: cmd
         working-directory: openssl
         run: nmake install
-      - name: Show dir
+      - name: Compress static library
         run: |
           cd $GITHUB_WORKSPACE/openssl/build
-          ls
-          ls include
+          7z a -tgzip -mx=9 ssl-lib-${{ matrix.platform }}-pc-windows-msvc.gz lib/libssl.lib
+          7z a -tgzip -mx=9 crypto-lib-${{ matrix.platform }}-pc-windows-msvc.gz lib/libcrypto.lib
+      - name: Upload ssl static library
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}/openssl/build/ssl-lib-${{ matrix.platform }}-pc-windows-msvc.gz
+          asset_name: ssl-lib-${{ matrix.platform }}-pc-windows-msvc.gz
+          asset_content_type: application/gzip
+      - name: Upload crypto static library
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ github.workspace }}/openssl/build/crypto-lib-${{ matrix.platform }}-pc-windows-msvc.gz
+          asset_name: crypto-lib-${{ matrix.platform }}-pc-windows-msvc.gz
+          asset_content_type: application/gzip
