@@ -31,7 +31,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          ./Configure no-shared no-zlib no-deprecated no-legacy no-apps no-tests --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          ./Configure no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
           make
           make install
       - name: Compress include files
@@ -92,7 +92,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          ./configure no-shared no-zlib no-deprecated no-legacy no-apps no-tests --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
+          ./configure no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl/build --openssldir=$GITHUB_WORKSPACE/openssl/build --release
           make
           make install
       - name: Compress static library
@@ -150,7 +150,7 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE/openssl
           mkdir build
-          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A no-shared no-zlib no-deprecated no-legacy no-apps no-tests --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build --release
+          $GITHUB_WORKSPACE/perl/perl/bin/perl.exe Configure VC-WIN64A no-shared no-zlib no-deprecated no-legacy no-apps no-tests no-docs -static --prefix=$GITHUB_WORKSPACE/openssl_build --openssldir=$GITHUB_WORKSPACE/openssl_build --release
       - name: Build static library
         shell: cmd
         working-directory: openssl/build
@@ -162,8 +162,8 @@ jobs:
       - name: Compress static library
         run: |
           cd $GITHUB_WORKSPACE/openssl/build
-          7z a -tgzip -mx=9 ssl-lib-${{ matrix.platform }}-pc-windows-msvc.gz libssl.lib
-          7z a -tgzip -mx=9 crypto-lib-${{ matrix.platform }}-pc-windows-msvc.gz libcrypto.lib
+          7z a -tgzip -mx=9 ssl-lib-${{ matrix.platform }}-pc-windows-msvc.gz lib/libssl.lib
+          7z a -tgzip -mx=9 crypto-lib-${{ matrix.platform }}-pc-windows-msvc.gz lib/libcrypto.lib
       - name: Upload ssl static library
         uses: actions/upload-release-asset@v1
         env:
